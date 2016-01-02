@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
+gem 'puma'
+gem 'websocket-rails'
+gem 'faye-websocket', '0.10.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.5'
