@@ -13,4 +13,11 @@ WebsocketRails::EventMap.describe do
   # The above will handle an event triggered on the client like `product.new`.
 
   subscribe :client_connected, :to => LiveController, :with_method => :client_connected
+  subscribe :connection_closed, :to => LiveController, :with_method => :client_disconnected
+  subscribe :stream, :to => LiveController, :with_method => :stream
+
+  namespace :map do
+      subscribe :update, :to => LiveController, :with_method => :update_map
+  end
+
 end
