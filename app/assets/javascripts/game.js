@@ -50,9 +50,20 @@ Keyboard.listenForEvents = function (keys) {
 		var tileY = Math.floor((event.pageY - this.offsetTop + Game.camera.y * 5) / 80) ;
 		var tileP = tileY * map.cols + tileX;
 		var tileD = map.layers[2][tileP];
-		map.layers[2][tileP] = 9*57 + 23;
+		map.layers[2][tileP] = map.brush;
 		$.ws.trigger("map.update", {id: tileP, b: map.layers[2][tileP]});
 		//alert(event.pageX + " " + event.pageY + "\n" + Game.camera.x + " " + Game.camera.y + "\n" + tileX + " " + tileY + "\n" + tileD + " " + tileP);
+	});
+
+
+	$("#toolbox").click(function(event) {
+		var tileX = Math.floor((event.pageX - this.offsetLeft) );
+		var tileY = Math.floor((event.pageY - this.offsetTop) );
+		var spaceX = Math.ceil(tileX / 16);
+		var spaceY = Math.ceil(tileY / 16);
+		tileX = Math.ceil((tileX - spaceX) / 16);
+		tileY = Math.floor((tileY - spaceY) / 16);
+		map.brush = tileY * 57 + tileX;
 	});
 
     keys.forEach(function (key) {
@@ -130,6 +141,7 @@ window.onload = function () {
 };
 
 var map = {
+	brush: 0,
     cols: 25,
     rows: 25,
     tsize: 16,
