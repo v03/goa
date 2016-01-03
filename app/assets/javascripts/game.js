@@ -44,28 +44,11 @@ Keyboard._keys = {};
 Keyboard.listenForEvents = function (keys) {
     window.addEventListener('keydown', this._onKeyDown.bind(this));
     window.addEventListener('keyup', this._onKeyUp.bind(this));
-	$("#game").click(function(event) {
-
-		var tileX = Math.floor((event.pageX - this.offsetLeft + Game.camera.x * 5) / 80) ;
-		var tileY = Math.floor((event.pageY - this.offsetTop + Game.camera.y * 5) / 80) ;
-		var tileP = tileY * map.cols + tileX;
-		var tileD = map.layers[2][tileP];
-		map.layers[2][tileP] = map.brush;
-		$.ws.trigger("map.update", {id: tileP, b: map.layers[2][tileP]});
-		//alert(event.pageX + " " + event.pageY + "\n" + Game.camera.x + " " + Game.camera.y + "\n" + tileX + " " + tileY + "\n" + tileD + " " + tileP);
+	$("#game").click(game_click);
+	$("#toolbox").click(toolbox_click);
+	$("#layer").change(function(ev) {
+		map.layer = $(this).val();
 	});
-
-
-	$("#toolbox").click(function(event) {
-		var tileX = Math.floor((event.pageX - this.offsetLeft) );
-		var tileY = Math.floor((event.pageY - this.offsetTop) );
-		var spaceX = Math.ceil(tileX / 16);
-		var spaceY = Math.ceil(tileY / 16);
-		tileX = Math.ceil((tileX - spaceX) / 16);
-		tileY = Math.floor((tileY - spaceY) / 16);
-		map.brush = tileY * 57 + tileX;
-	});
-
     keys.forEach(function (key) {
         this._keys[key] = false;
     }.bind(this));
@@ -142,6 +125,7 @@ window.onload = function () {
 
 var map = {
 	brush: 0,
+	layer: 1,
     cols: 25,
     rows: 25,
     tsize: 16,
@@ -294,9 +278,9 @@ Game._drawLayer = function (layer) {
 
 Game.render = function () {
     // draw map background layer
-    this._drawLayer(0);
-	this._drawLayer(1);
-	this._drawLayer(2);
+	for (i in map.layers) {
+	    this._drawLayer(i);
+	}
 	//$.ws.trigger("data", {x: this.x, y: this.y});
     // draw map top layer
     //this._drawLayer(1);

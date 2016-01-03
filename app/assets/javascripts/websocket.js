@@ -6,17 +6,16 @@ $(document).ready(function() {
 	}
 
 	$.stream = $.ws.subscribe('stream');
+
+	
+
 	$.stream.bind('data', function(data) {
 		$("#messagelog").append("<p>" + data + " : " + map.rows + "</p>");
 
 	});
 
-	$.stream.bind('map_update', function(data) {
-		var d = jQuery.parseJSON(data);
-		for(i in d) {
-			map.layers[2][d[i].id] = d[i].b;
-		}
-	});
+	$.stream.bind('map_update', map_update);
+
 
 
 });

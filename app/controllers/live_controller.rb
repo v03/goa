@@ -1,7 +1,7 @@
 class LiveController < WebsocketRails::BaseController
 
 	def initialize_session
-		controller_store[:map] = []
+		controller_store[:map] = {}
 	end
 
     def client_connected
@@ -13,8 +13,12 @@ class LiveController < WebsocketRails::BaseController
     end
 
 	def update_map
-		controller_store[:map] << message
-		controller_store[:map].uniq!
+		unless message[:layer].nil?
+			p message
+			layer = message[:layer].to_i
+			controller_store[:map][layer] = {} if controller_store[:map][layer].nil?
+			controller_store[:map][layer][message[:id].to_i] = message[:brush].to_i
+		end
 		WebsocketRails[:stream].trigger(:map_update, controller_store[:map].to_json)
 	end
 
