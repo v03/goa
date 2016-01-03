@@ -42,3 +42,9 @@ var map_update = function(data) {
 
 	}
 }
+
+
+$(document).ready(function() {
+	map.newMap({base: 1});
+	map.loadMap("map_void");
+});

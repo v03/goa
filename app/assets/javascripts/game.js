@@ -51,9 +51,11 @@ Keyboard.listenForEvents = function (keys) {
 	});
 	$(".map-picker li a").click(function(ev) {
 		var map_id = $(this).attr("id");
-		$.ws.trigger("map.new", { map_id: map_id } )
-		map.id = map_id
-		map.newMap({base: 1});
+		map.loadMap(map_id);
+
+		//$.ws.trigger("map.new", { map_id: map_id } )
+		//map.id = map_id
+		//map.newMap({base: 1});
 	});
     keys.forEach(function (key) {
         this._keys[key] = false;
@@ -127,10 +129,12 @@ Game.render = function () {};
 window.onload = function () {
     var context = document.getElementById('game').getContext('2d');
     Game.run(context);
+
 };
 
 var map = {
 	id: "map_void",
+	stream: null,
 	brush: 1,
 	layer: 5,
     cols: 150,
@@ -142,13 +146,27 @@ var map = {
     },
 	newMap: function(data) {
 		this.layers = [[]];
+		if(this.stream != null) {
+			$.ws.unsubscribe(this.id);
+		}
+
 		for(var i=0; i<map.cols * map.rows; i++) {
 			this.layers[0][i] = data.base;
 		}
+	},
+	loadMap: function(name) {
+		this.newMap({base: 1});
+		this.id = name;
+		this.stream = $.ws.subscribe(this.id);
+		this.stream.bind("map_update", map_update);
+
+		$.ws.trigger("map.new", { map_id: name } )
+
 	}
 };
 
-map.newMap({base: 1});
+
+//$.ws.trigger("map.new", { map_id: "map_void" } )
 
 for(var i=0; i<map.cols * map.rows; i++) {
 	map.layers[0][i] = 0;
