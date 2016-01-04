@@ -93,6 +93,7 @@ var Game = {};
 
 Game.run = function (context) {
     this.ctx = context;
+	this.ctxj = $(context);
     this._previousElapsed = 0;
 
     var p = this.load();
@@ -106,7 +107,7 @@ Game.tick = function (elapsed) {
     window.requestAnimationFrame(this.tick);
 
     // clear previous frame
-    this.ctx.clearRect(0, 0, 720, 720);
+    this.ctx.clearRect(0, 0, 1200, 1200);
 
     // compute delta time in seconds -- also cap it
     var delta = (elapsed - this._previousElapsed) / 1000.0;
@@ -135,10 +136,10 @@ window.onload = function () {
 var map = {
 	id: "map_void",
 	stream: null,
-	brush: 1,
+	brush: 6,
 	layer: 5,
-    cols: 150,
-    rows: 90,
+    cols: 200,
+    rows: 200,
     tsize: 16,
     layers: [[]],
     getTile: function (layer, col, row) {
@@ -168,9 +169,9 @@ var map = {
 
 //$.ws.trigger("map.new", { map_id: "map_void" } )
 
-for(var i=0; i<map.cols * map.rows; i++) {
-	map.layers[0][i] = 0;
-}
+//for(var i=0; i<map.cols * map.rows; i++) {
+//	map.layers[0][i] = 0;
+//}
 
 function Camera(map, width, height) {
     this.x = 0;
@@ -179,12 +180,14 @@ function Camera(map, width, height) {
     this.height = height;
     this.maxX = 256;//map.cols * (map.tsize*5) - width ;
     this.maxY = 256;//map.rows * (map.tsize*5) - height ;
-	this.maxX = (map.cols - 9) * 16;
-	this.maxY = (map.rows - 9) * 16;
-	//alert(this.width + " " + this.height + " " + this.maxX + " " + this.maxY);
+	this.maxX = (map.cols - 25) * 16;
+	this.maxY = (map.rows - 25) * 16;
+	//this.maxY = 720;
+	//this.maxY = 800
+	//alert(this.width + " " + this.height + " " + this.maxX + " " + this.maxY + " " + map.cols + " " + map.rows);
 }
 
-Camera.SPEED = 256; // pixels per second
+Camera.SPEED = 1024; // pixels per second
 
 Camera.prototype.move = function (delta, dirx, diry) {
     // move camera
@@ -207,7 +210,7 @@ Game.init = function () {
     Keyboard.listenForEvents(
         [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
     this.tileAtlas = Loader.getImage('tiles');
-    this.camera = new Camera(map, 1200, 1200);
+    this.camera = new Camera(map, 800, 640);
 
 };
 
@@ -227,8 +230,8 @@ Game.update = function (delta) {
 Game._drawLayer = function (layer) {
     var startCol = Math.floor(this.camera.x / map.tsize);
     var endCol = startCol + (this.camera.width / map.tsize);
-    var startRow = Math.floor(this.camera.y / (map.tsize*5));
-    var endRow = startRow + (this.camera.height / (map.tsize));
+    var startRow = Math.floor(this.camera.y / (map.tsize));
+    var endRow = startRow + (this.camera.height / (map.tsize*2));
     var offsetX = -this.camera.x + startCol * map.tsize;
     var offsetY = -this.camera.y + startRow * map.tsize;
 
@@ -250,10 +253,10 @@ Game._drawLayer = function (layer) {
                     imgRow * map.tsize + imgRow, // source y
                     map.tsize, // source width
                 	map.tsize, // source height
-                    Math.round(x) * 5  ,  // target x
-                    Math.round(y) * 5  , // target y
-                    map.tsize * 5 , // target width
-                    map.tsize * 5// target height
+                    Math.round(x) * 2  ,  // target x
+                    Math.round(y) * 2  , // target y
+                    map.tsize * 2 , // target width
+                    map.tsize * 2// target height
                 );
             }
         }

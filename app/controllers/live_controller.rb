@@ -2,8 +2,11 @@ class LiveController < WebsocketRails::BaseController
 
 	def initialize_session
 		controller_store[:map] = {}
-		map_id = "map_void"
-		controller_store[map_id] = {:map_id => map_id, :world => {}} if controller_store[map_id].nil?
+		Map.all.each do |map|
+			controller_store[map.name] = {:map_id => map.name, :world => JSON.load(map.world)}
+		end
+		#map_id = "map_void"
+		#controller_store[map_id] = {:map_id => map_id, :world => {}} if controller_store[map_id].nil?
 	end
 
     def client_connected
@@ -32,9 +35,25 @@ class LiveController < WebsocketRails::BaseController
 			controller_store[map_id][:world][layer][message[:id].to_i] = message[:brush].to_i
 		end
 		WebsocketRails[map_id].trigger(:map_update, controller_store[map_id].to_json)
+		save_map(map_id)
 	end
+
+
 
 	def stream
 
 	end
+
+	private
+	def save_map(map_id)
+		if Map.where(:name => map_id).blank?
+			puts "No such map exists - insert"
+			Map.create(:name => map_id, :world => controller_store[map_id][:world].to_json)
+		else
+			puts "Updating map"
+			Map.find_by(:name => map_id).update(:world => controller_store[map_id][:world].to_json)
+
+		end
+	end
+
 end
