@@ -20,6 +20,7 @@ WebsocketRails::EventMap.describe do
       subscribe :update, :to => LiveController, :with_method => :update_map
       subscribe :pull, :to => LiveController, :with_method => :pull
       subscribe :new, :to => LiveController, :with_method => :new_map
+      subscribe :delete, :to => LiveController, :with_method => :delete_tile
   end
 
 end

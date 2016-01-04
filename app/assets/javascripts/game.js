@@ -38,13 +38,14 @@ Keyboard.LEFT = 37;
 Keyboard.RIGHT = 39;
 Keyboard.UP = 38;
 Keyboard.DOWN = 40;
-
+Keyboard.DELETE = 46;
 Keyboard._keys = {};
 
 Keyboard.listenForEvents = function (keys) {
     window.addEventListener('keydown', this._onKeyDown.bind(this));
     window.addEventListener('keyup', this._onKeyUp.bind(this));
 	$("#game").click(game_click);
+	$("#game").mousemove(game_move);
 	$("#toolbox").click(toolbox_click);
 	$("#layer").change(function(ev) {
 		map.layer = $(this).val();
@@ -72,10 +73,14 @@ Keyboard._onKeyDown = function (event) {
 
 Keyboard._onKeyUp = function (event) {
     var keyCode = event.keyCode;
-    if (keyCode in this._keys) {
-        event.preventDefault();
-        this._keys[keyCode] = false;
-    }
+	if (keyCode == Keyboard.DELETE) {
+		game_delete(this.ctx);
+	} else {
+	    if (keyCode in this._keys) {
+	        event.preventDefault();
+	        this._keys[keyCode] = false;
+	    }
+	}
 };
 
 Keyboard.isDown = function (keyCode) {
@@ -208,7 +213,7 @@ Game.load = function () {
 
 Game.init = function () {
     Keyboard.listenForEvents(
-        [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN]);
+        [Keyboard.LEFT, Keyboard.RIGHT, Keyboard.UP, Keyboard.DOWN, Keyboard.DELETE]);
     this.tileAtlas = Loader.getImage('tiles');
     this.camera = new Camera(map, 800, 640);
 
@@ -222,6 +227,7 @@ Game.update = function (delta) {
     if (Keyboard.isDown(Keyboard.RIGHT)) { dirx = 1; }
     if (Keyboard.isDown(Keyboard.UP)) { diry = -1; }
     if (Keyboard.isDown(Keyboard.DOWN)) { diry = 1; }
+
 
 
     this.camera.move(delta, dirx, diry);

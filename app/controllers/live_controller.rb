@@ -38,7 +38,20 @@ class LiveController < WebsocketRails::BaseController
 		save_map(map_id)
 	end
 
+	def delete_tile
+		unless message[:tile_id].nil?
+			map_id = message[:map_id]
+			tile_id = message[:tile_id]
+			controller_store[map_id][:world].each_key do |layer|
+				puts "Deleting #{layer} -> #{tile_id}"
 
+				controller_store[map_id][:world][layer][tile_id] = nil;
+				#p controller_store[map_id][:world][layer-1].delete(tile_id)
+			end
+		end
+		puts "Deleting tile #{message[:tile_id]}"
+		WebsocketRails[map_id].trigger(:map_update, controller_store[map_id].to_json)
+	end
 
 	def stream
 
