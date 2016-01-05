@@ -31,8 +31,8 @@ class LiveController < WebsocketRails::BaseController
 		unless message[:layer].nil?
 
 			map_id = message[:map_id]
-			layer = message[:layer].to_i
-			tile_id = message[:id].to_i
+			layer = message[:layer].to_i.to_s
+			tile_id = message[:id].to_i.to_s
 
 
 			controller_store[map_id][:world][tile_id] = {} if controller_store[map_id][:world][tile_id].nil?
@@ -48,11 +48,11 @@ class LiveController < WebsocketRails::BaseController
 	def delete_tile
 		unless message[:tile_id].nil?
 			map_id = message[:map_id]
-			tile_id = message[:tile_id]
-			layer = message[:layer]
+			tile_id = message[:tile_id].to_i.to_s
+			layer = message[:layer].to_i.to_s
 
 
-			controller_store[map_id][:world][tile_id][layer] = nil;
+			controller_store[map_id][:world][tile_id][layer] = nil unless controller_store[map_id][:world][tile_id].nil?
 
 			puts "Deleting layer #{layer} from #{tile_id}"
 		end
