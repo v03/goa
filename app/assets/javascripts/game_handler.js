@@ -38,20 +38,13 @@ var game_move = function(event) {
 }
 
 var game_delete = function(event) {
-	return;
+
 	var tileX = Math.floor((map.cursor.pageX - map.camera.offsetLeft + Game.camera.x * 2) / 32) ;
 	var tileY = Math.floor((map.cursor.pageY - map.camera.offsetTop + Game.camera.y * 2) / 32) ;
 	var tileP = tileY * map.cols + tileX;
-	for( var layer in map.layers) {
-		if (!map.layers.hasOwnProperty(layer))
-			continue;
-		if (map.layers[layer][tileP] != undefined) {
-			map.layers[layer][tileP] = 0;
-
-		}
-
-	}
-	$.ws.trigger("map.delete", { map_id: map.id, tile_id: tileP });
+	map.layers[tileP][map.layer] = 0;
+	
+	$.ws.trigger("map.delete", { map_id: map.id, tile_id: tileP, layer: map.layer });
 }
 
 var gen_infobox = function(data) {
@@ -78,7 +71,7 @@ var toolbox_click = function(event) {
 
 var map_update = function(data) {
 	var d = jQuery.parseJSON(data);
-	
+
 	map.num_layers = d.num_layers;
 
 	//$("#messagelog").append("<p>Receiving map: " + d.map_id + " </p>");

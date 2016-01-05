@@ -49,11 +49,12 @@ class LiveController < WebsocketRails::BaseController
 		unless message[:tile_id].nil?
 			map_id = message[:map_id]
 			tile_id = message[:tile_id]
+			layer = message[:layer]
 
-			top_layer = get_max_layer(map_id)
-			controller_store[map_id][:world][tile_id][top_layer] = nil;
 
-			puts "Deleting layer #{top_layer} from #{tile_id}"
+			controller_store[map_id][:world][tile_id][layer] = nil;
+
+			puts "Deleting layer #{layer} from #{tile_id}"
 		end
 		puts "Deleting tile #{message[:tile_id]}"
 		WebsocketRails[map_id].trigger(:map_update, controller_store[map_id].to_json)
@@ -82,6 +83,11 @@ class LiveController < WebsocketRails::BaseController
 			tile[1].keys.map{|k| k.to_i}.max
 		end
 		return max_layer.max
+	end
+
+	def get_max_layer_tile(map_id, tile_id)
+		p controller_store[map_id][:world][tile_id]
+		return controller_store[map_id][:world][tile_id].keys.map{|k| k.to_i}.max
 	end
 
 
