@@ -49,6 +49,7 @@ Keyboard.listenForEvents = function (keys) {
 	$("#toolbox").click(toolbox_click);
 	$("#layer").change(function(ev) {
 		map.layer = $(this).val();
+
 	});
 	$(".map-picker li a").click(function(ev) {
 		var map_id = $(this).attr("id");
@@ -147,18 +148,25 @@ var map = {
     rows: 200,
     tsize: 16,
     layers: [[]],
+	checked: 0,
+	num_layers: 0,
     getTile: function (layer, col, row) {
-        return this.layers[layer][row * map.cols + col];
+		if(this.layers[row * map.cols + col] == undefined)
+			this.layers[row * map.cols + col] = [1];
+		return this.layers[row * map.cols + col][layer];
+
     },
 	newMap: function(data) {
 		this.layers = [[]];
+		this.num_layers = 1;
 		if(this.stream != null) {
 			$.ws.unsubscribe(this.id);
 		}
 
 		for(var i=0; i<map.cols * map.rows; i++) {
-			this.layers[0][i] = data.base;
+			this.layers[i] = {0: 1}
 		}
+
 	},
 	loadMap: function(name) {
 		this.newMap({base: 1});
@@ -271,8 +279,9 @@ Game._drawLayer = function (layer) {
 
 Game.render = function () {
     // draw map background layer
-	for (i in map.layers) {
-	    this._drawLayer(i);
+	for(var layer = 0; layer <= map.num_layers; layer++) {
+	//	alert(layer);
+		this._drawLayer(layer);
 	}
 	//$.ws.trigger("data", {x: this.x, y: this.y});
     // draw map top layer

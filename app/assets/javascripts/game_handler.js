@@ -1,12 +1,15 @@
 var game_click = function(event) {
-	if (!map.layers[map.layer])
-		map.layers[map.layer] = {};
+
 	var tileX = Math.floor((event.pageX - this.offsetLeft + Game.camera.x * 2) / 32) ;
 	var tileY = Math.floor((event.pageY - this.offsetTop + Game.camera.y * 2) / 32) ;
 	var tileP = tileY * map.cols + tileX;
-	var tileD = map.layers[map.layer][tileP];
-	map.layers[map.layer][tileP] = map.brush;
-	$.ws.trigger("map.update", { map_id: map.id, layer: map.layer, id: tileP, tileX: tileX, tileY: tileY, brush: map.layers[map.layer][tileP]});
+	if (!map.layers[tileP])
+		map.layers[tileP] = {};
+	var tileD = map.layers[tileP][map.layer];
+	if(map.num_layers < map.layer)
+		map.num_layers = map.layer;
+	map.layers[tileP][map.layer] = map.brush;
+	$.ws.trigger("map.update", { map_id: map.id, layer: map.layer, id: tileP, tileX: tileX, tileY: tileY, brush: map.layers[tileP][map.layer]});
 	//alert(event.pageX + " " + event.pageY + "\n" + Game.camera.x + " " + Game.camera.y + "\n" + tileX + " " + tileY + "\n" + tileD + " " + tileP + " " + map.layers[0].length);
 }
 
@@ -17,11 +20,11 @@ var game_move = function(event) {
 	var tileY = Math.floor((event.pageY - this.offsetTop + Game.camera.y * 2) / 32) ;
 	var tileP = tileY * map.cols + tileX;
 	var tileA = "<ul>";
-	for( var layer in map.layers) {
+	for( var layer in map.layers[tileP]) {
 		if (!map.layers.hasOwnProperty(layer))
 			continue;
-		if(map.layers[layer][tileP] != undefined)
-			tileA = tileA + "<li>Layer " + layer + ": " + map.layers[layer][tileP] + "</li>";
+		if(map.layers[tileP][layer] != undefined)
+			tileA = tileA + "<li>Layer " + layer + ": " + map.layers[tileP][layer] + "</li>";
 	}
 
 	tileA = tileA + "</ul>";
@@ -35,7 +38,7 @@ var game_move = function(event) {
 }
 
 var game_delete = function(event) {
-
+	return;
 	var tileX = Math.floor((map.cursor.pageX - map.camera.offsetLeft + Game.camera.x * 2) / 32) ;
 	var tileY = Math.floor((map.cursor.pageY - map.camera.offsetTop + Game.camera.y * 2) / 32) ;
 	var tileP = tileY * map.cols + tileX;
@@ -75,21 +78,24 @@ var toolbox_click = function(event) {
 
 var map_update = function(data) {
 	var d = jQuery.parseJSON(data);
+	
+	map.num_layers = d.num_layers;
+
 	//$("#messagelog").append("<p>Receiving map: " + d.map_id + " </p>");
 	if(map.id != d.map_id) {
 		return;
 	}
 
-	for(var layer in d.world) {
-		if (!d.world.hasOwnProperty(layer))
+	for(var tileP in d.world) {
+		if (!d.world.hasOwnProperty(tileP))
 			continue;
-		if (!map.layers[layer])
-			map.layers[layer] = {};
-		for(tile in d.world[layer]) {
-			if (!d.world[layer].hasOwnProperty(tile))
+		if (!map.layers[tileP])
+			map.layers[tileP] = {};
+		for(var layer in d.world[tileP]) {
+			if (!d.world[tileP].hasOwnProperty(layer))
 				continue;
 
-			map.layers[layer][tile] = d.world[layer][tile];
+			map.layers[tileP][layer] = d.world[tileP][layer];
 
 		}
 
